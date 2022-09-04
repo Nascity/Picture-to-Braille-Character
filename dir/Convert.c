@@ -68,14 +68,12 @@ WCHAR** Convert(BITMAP bmp, DETECT dt)
 
 		if (bPixelComplete)
 		{
-			// 픽셀의 색이 타겟 색과 감도 내에 있을 때
-			if (abs(tmpPixel.rgbtBlue - dt.target.rgbtBlue) <= dt.sensitivity &&
-				abs(tmpPixel.rgbtGreen - dt.target.rgbtGreen) <= dt.sensitivity &&
-				abs(tmpPixel.rgbtRed - dt.target.rgbtRed) <= dt.sensitivity)
+			// 픽셀의 색이 타겟 색과 감도 내에 있을 때 (sRGB 알고리즘)
+			if (DetectColor(tmpPixel, dt))
 			{
 				// 보낼 좌표 제작
 				indexBitmap.x = ((i % bytes_per_line) - ((i % bytes_per_line) % 3)) / 3;
-				indexBitmap.y = (i - (i % bytes_per_line)) / bytes_per_line;
+				indexBitmap.y = (corrected_height - (i - (i % bytes_per_line)) / bytes_per_line);
 
 				// 위치와 더할 값을 얻음
 				tmp = BitmapIndexToBufferIndexAndAdd(indexBitmap, &indexBuffer);
@@ -153,4 +151,16 @@ DWORD BitmapIndexToBufferIndexAndAdd(INDEX indexBitmap, LPINDEX indexBuffer)
 	else				shift = remain.x ? remain.y + 4 : remain.y + 1;
 
 	return 1 << (shift - 1);
+}
+
+BOOL DetectColor(RGBTRIPLE color, DETECT dt)
+{
+	DOUBLE	dstBlue_Sqred = pow(((DOUBLE)color.rgbtBlue) - ((DOUBLE)dt.target.rgbtBlue), 2);
+	DOUBLE	dstGreen_Sqrd = pow(((DOUBLE)color.rgbtGreen) - ((DOUBLE)dt.target.rgbtGreen), 2);
+	DOUBLE	dstRed_Sqrd = pow(((DOUBLE)color.rgbtRed) - ((DOUBLE)dt.target.rgbtRed), 2);
+	
+	DOUBLE	dst_Sqrd = dstBlue_Sqred + dstGreen_Sqrd + dstRed_Sqrd;
+
+	if (sqrt(dst_Sqrd) <= (DOUBLE)dt.sensitivity)	return TRUE;
+	else											return FALSE;
 }

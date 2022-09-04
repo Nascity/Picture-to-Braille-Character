@@ -1,8 +1,9 @@
 #include <Windows.h>
 #include <tchar.h>
 
-#include "Resource.h"
+#include <commctrl.h>
 
+#include "Resource.h"
 
 #include "Cleanup.h"
 #include "Convert.h"
@@ -15,9 +16,6 @@ name='Microsoft.Windows.Common-Controls' version='6.0.0.0' \
 processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
 
-#define DEFALUT_SIZE	256
-
-
 
 INT_PTR CALLBACK DlgProc
 (HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
@@ -28,7 +26,9 @@ INT_PTR CALLBACK DlgProc
 	static HBITMAP	hb;		// 비트맵 오브젝트
 	static HBITMAP	hb_def;	// 기본 비트맵 오브젝트
 	static BITMAP	bmp;	// 비트맵
-	static BOOL		bLoaded;// 로드 되었는가?
+
+	static BOOL		bLoaded;	// 로드 되었는가?
+	static BOOL		bConverted;	// 변환 되었는가?
 
 	static BOOL		bUseinput;		// 에디트 박스에 적힌 비트맵 크기를 사용
 	static DWORD	dwInputWidth;	// 적힌 너비
@@ -41,9 +41,14 @@ INT_PTR CALLBACK DlgProc
 	static DWORD	str_width;	// 문자열 너비
 	static DWORD	str_height;	// 문자열 높이
 
+	static MSG		msg;	// 임시 변수
+
 	switch (iMsg)
 	{
 	case WM_INITDIALOG:
+		// 창 이름 설정
+		SetWindowText(hwnd, _T("PTB converter"));
+
 		// filename 초기화
 		memset(filename, 0, sizeof(TCHAR) * MAX_PATH);
 
@@ -62,6 +67,7 @@ INT_PTR CALLBACK DlgProc
 		// 비트맵 관련 변수 초기화
 		hb = NULL;
 		bLoaded = FALSE;
+		bConverted = FALSE;
 
 		// 기본 비트맵 로딩
 		hb_def = LoadImage
@@ -128,6 +134,9 @@ INT_PTR CALLBACK DlgProc
 					EnableButton(hwnd, BUTTON_ERASE);
 					EnableButton(hwnd, BUTTON_CONVERT);
 
+					// 슬라이드 컨트롤 활성화
+					EnableTrackbar(hwnd, SENSITIVITY_SLIDER);
+
 					// 사진을 비트맵 컨트롤에 띄우기
 					DisplayImage(hwnd, hb);
 
@@ -135,6 +144,20 @@ INT_PTR CALLBACK DlgProc
 				}
 			}
 			break;
+
+		case SENSITIVITY_SLIDER:
+			if (bConverted)
+			{
+				msg.hwnd = hwnd;
+				msg.message = WM_COMMAND;
+				msg.wParam = MAKEWORD(BUTTON_CONVERT, 0);
+				msg.lParam = GetDlgItem(hwnd, BUTTON_CONVERT);
+				msg.time = 0;
+				msg.pt.x = 0;
+				msg.pt.y = 0;
+
+				DispatchMessage(&msg);
+			}
 
 		case BUTTON_ERASE:
 			// 기본 비트맵으로 바꿈
@@ -147,6 +170,11 @@ INT_PTR CALLBACK DlgProc
 			DisableButton(hwnd, BUTTON_ERASE);
 			DisableButton(hwnd, BUTTON_CONVERT);
 
+			// 슬라이드 컨트롤 비활성화
+			DisableTrackbar(hwnd, SENSITIVITY_SLIDER);
+
+			// 변환 안 됨
+			bConverted = FALSE;
 			break;
 
 		case BUTTON_CONVERT:
@@ -155,7 +183,7 @@ INT_PTR CALLBACK DlgProc
 			dt.target.rgbtBlue = 0xff;
 			dt.target.rgbtGreen = 0xff;
 			dt.target.rgbtRed = 0xff;
-			dt.sensitivity = 20;
+			dt.sensitivity = SendMessage(GetDlgItem(hwnd, SENSITIVITY_SLIDER), TBM_GETPOS, 0, 0);
 
 			// 사진-배열 변환
 			braille = Convert(bmp, dt);
@@ -170,6 +198,8 @@ INT_PTR CALLBACK DlgProc
 			// 문자열 표시
 			SetDlgItemTextW(hwnd, OUTPUT_EDIT, string);
 
+			// 변환됨
+			bConverted = TRUE;
 			break;
 
 		case BUTTON_EXIT:

@@ -3,7 +3,6 @@
 // Used by PTB.rc
 //
 #define DIALOG_MAIN                     101
-#define IDB_BITMAP1                     103
 #define BITMAP_DEFAULT                  103
 #define PIC_IMAGE                       1001
 #define BUTTON_LOAD                     1002
@@ -14,6 +13,8 @@
 #define INPUT_WIDTH                     1007
 #define OUTPUT_EDIT                     1008
 #define CHECKBOX_USE                    1009
+#define IDC_SLIDER1                     1012
+#define SENSITIVITY_SLIDER              1012
 
 // Next default values for new objects
 // 
@@ -21,7 +22,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        104
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1012
+#define _APS_NEXT_CONTROL_VALUE         1013
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

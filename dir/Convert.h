@@ -23,4 +23,6 @@ LPWSTR ConvertToString(WCHAR** dpwc, DWORD width, DWORD height);
 
 DWORD BitmapIndexToBufferIndexAndAdd(INDEX indexBitmap, LPINDEX indexBuffer);
 
+BOOL DetectColor(RGBTRIPLE color, DETECT dt);
+
 #endif
