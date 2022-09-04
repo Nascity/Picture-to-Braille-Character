@@ -3,7 +3,7 @@
 #ifndef _CTRL_H_
 #define _CTRL_H_
 
-#define MAX_SENSITIVITY		256
+#define MAX_SENSITIVITY		430
 
 VOID EnableButton(HWND hwnd, INT identifier);
 
