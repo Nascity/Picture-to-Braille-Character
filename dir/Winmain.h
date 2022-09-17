@@ -10,7 +10,7 @@ INT WINAPI _tWinMain
 LRESULT CALLBACK WndProc
 (HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam);
 
-INT_PTR DlgProc
+INT_PTR CALLBACK DlgProc
 (HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam);
 
 #endif
