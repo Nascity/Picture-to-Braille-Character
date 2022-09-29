@@ -1,5 +1,6 @@
 # Picture to Braille Character (WIP)
 A simple program that converts bitmap image to Braille characters.
+
 Selecting specific colors from an image is not implemented at the moment.
 ## Usage
 ![Main window of the program](img/pic.png)
